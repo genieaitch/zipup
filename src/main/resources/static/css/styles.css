@@ -225,10 +225,10 @@ body, html, h1, h2, p, div, a {
     transition: filter 0.3s ease;
 }
 .signup-button-box:hover img.shop_icon {
-    content: url("/images/svg/shopBlue.svg");
+    content: url("../images/svg/shopBlue.svg");
 }
 .signup-button-box:hover img.cart_icon {
-    content: url("/images/svg/cartBlue.svg");
+    content: url("../images/svg/cartBlue.svg");
 }
 .signup-button-box p {
     font-size: 18px;
@@ -240,3 +240,5 @@ body, html, h1, h2, p, div, a {
 .signup-button-box:hover p {
     color: #3e71fe;
 }
+
+
