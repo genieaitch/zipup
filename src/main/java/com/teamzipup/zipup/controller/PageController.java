@@ -8,11 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class PageController {
 
-//    @GetMapping("/")
-//    public String index() {
-//        return "index"; // index.html로 이동
-//    }
-
     @GetMapping("/login")
     public String login() {
         return "login"; // login.html로 이동
@@ -40,7 +35,7 @@ public class PageController {
 
     @GetMapping("/product/add")
     public String productAdd() {
-        return "productAdd"; // product/add로 이동
+        return "productAdd"; // productAdd.html로 이동
     }
 
     @GetMapping("/product/detail")
@@ -48,5 +43,8 @@ public class PageController {
         return "productDetail"; // productDetail.html로 이동
     }
 
-
+    @GetMapping("purchase/completed")
+    public String purchaseCompleted() {
+        return "purchaseCompleted"; // purchaseCompleted.html로 이동
+    }
 }
