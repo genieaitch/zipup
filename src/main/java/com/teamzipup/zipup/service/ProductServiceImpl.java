@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -17,16 +18,26 @@ public class ProductServiceImpl implements ProductService {
     private ProductMapper productMapper;
 
     @Override
+    public List<Product> getAllProducts() {
+        return productMapper.findAll();
+    }
+
+    @Override
+    public List<Product> getProductsByCategory(String category) {
+        return productMapper.findByCategory(category);
+    }
+
+    @Override
     public long insertProduct(
-        long sellerId,
-        MultipartFile image,
-        String productName,
-        int price,
-        String option1,
-        String option2,
-        String option3,
-        String category,
-        MultipartFile description) {
+            long sellerId,
+            MultipartFile image,
+            String productName,
+            int price,
+            String option1,
+            String option2,
+            String option3,
+            String category,
+            MultipartFile description) {
         String productDir = System.getProperty("user.dir") + "/src/main/resources/static/images/product_images/";
         String descriptionDir = System.getProperty("user.dir") + "/src/main/resources/static/images/description_images/";
 
@@ -44,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
 
         try {
             if (!imageFile.getParentFile().exists()) {
-                 imageFile.getParentFile().mkdirs();
+                imageFile.getParentFile().mkdirs();
             }
             if (!descriptionFile.getParentFile().exists()) {
                 descriptionFile.getParentFile().mkdirs();
@@ -77,8 +88,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
+    // 상품 판매자 조회
     @Override
     public Product getProductById(long id) {
         return productMapper.findById(id);
+    }
+
+    @Override
+    public List<Product> searchProducts(String productName, String category, Integer minPrice, Integer maxPrice) {
+        return productMapper.searchProducts(productName, category, minPrice, maxPrice);
     }
 }

@@ -4,14 +4,23 @@
 
 <mapper namespace="com.teamzipup.zipup.mapper.ProductMapper">
 
-    <!--***************판매자 생성 페이지(product/add)*******************-->
+    <!-- 전체 상품 리스트 -->
+    <select id="findAll">
+        SELECT * FROM product
+    </select>
+
+    <!-- 카테고리별 상품 리스트 -->
+    <select id="findByCategory">
+        SELECT * FROM product WHERE category = #{category}
+    </select>
+
     <!-- 판매자 제품 등록 하기 -->
-    <insert id="insertProduct">
-        INSERT INTO PRODUCT(IMAGE, CATEGORY, PRODUCTNAME, PRICE, OPTION1, OPTION2, OPTION3, DESCRIPTION)
-        VALUES (#{image}, #{category}, #{productName}, #{price}, #{option1}, #{option2}, #{option3}, #{description});
+    <insert id="insertProduct" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO PRODUCT (SELLERID, IMAGE, CATEGORY, PRODUCTNAME, PRICE, OPTION1, OPTION2, OPTION3, DESCRIPTION)
+        VALUES (#{sellerId}, #{image}, #{category}, #{productName}, #{price}, #{option1}, #{option2}, #{option3}, #{description});
     </insert>
 
-    <!--***************이용자 상세 페이지(product/detail)*******************-->
+
     <!-- 제품 색상 옵션 데이터 불러오기 -->
     <select id="optionColor">
         SELECT OPTION1
@@ -31,6 +40,22 @@
         SELECT DESCRIPTION
         FROM PRODUCT
         WHERE id = #{id}
+    </select>
+
+    <!-- 상품 조회 -->
+    <select id="findById">
+        SELECT *
+        FROM product
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 구매 완료 -->
+    <select id="announcement">
+        SELECT U.userName, U.phoneNumber, U.address, U.companyName, P.productName, P.option1, P.option2, P.option3, P.price
+        FROM USER U
+        JOIN PRODUCT P
+        ON U.ID = P.sellerID
+        WHERE p.ID = #{id}
     </select>
 
 </mapper>
