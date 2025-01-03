@@ -8,13 +8,11 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -27,37 +25,11 @@ public class ProductController {
     @Autowired
     private UserService userService;
 
-    /* 메인 페이지 */
-    @GetMapping("/")
-    public String mainPage(HttpSession session, Model model) {
-        // 로그인 사용자 확인
-        User loginUser = (User) session.getAttribute("loginUser");
-        if (loginUser != null) {
-            model.addAttribute("user", loginUser);
-        }
-
-        // 상품 리스트 가져오기
-        List<Product> products = productService.getAllProducts();
-        model.addAttribute("products", products);
-
-        return "index"; // 메인 페이지
-    }
-
-    /* 전체 상품 리스트 페이지 */
-    @GetMapping("/products")
-    public String productListPage(Model model) {
-        List<Product> products = productService.getAllProducts();
-        model.addAttribute("products", products);
-        return "productList"; // 상품 리스트 페이지
-    }
-
-    /* 카테고리별 상품 리스트 페이지 */
-    @GetMapping("/products/category")
-    public String categoryPage(@RequestParam("category") String category, Model model) {
-        List<Product> products = productService.getProductsByCategory(category);
-        model.addAttribute("products", products);
-        model.addAttribute("selectedCategory", category);
-        return "productList"; // 카테고리별 상품 리스트 템플릿
+    // 가격 포매팅
+    private List<String> formatPrices(List<Product> products) {
+        return (products == null || products.isEmpty())
+                ? new ArrayList<>()
+                : products.stream().map(product -> String.format("%,d", product.getPrice())).toList();
     }
 
     /* 상품 등록 페이지 */
@@ -75,7 +47,7 @@ public class ProductController {
             return "redirect:/";
         }
 
-        return "productAdd"; // 상품 등록 페이지
+        return "productAdd";
     }
 
     /* 상품 등록 요청 처리 */
@@ -103,7 +75,7 @@ public class ProductController {
             return "redirect:/product/detail/" + productId;
         } catch (Exception e) {
             model.addAttribute("error", "상품 등록 중 문제가 발생했습니다.");
-            return "productAdd"; // 상품 등록 페이지로 이동
+            return "productAdd";
         }
     }
 
@@ -117,7 +89,7 @@ public class ProductController {
 
         if (loginUser == null) {
             model.addAttribute("error", "로그인이 필요합니다.");
-            return "redirect:/login"; // 비회원은 로그인 페이지로 리디렉션
+            return "redirect:/login"; // 비회원은 로그인 페이지로
         }
 
         if (product == null) {
@@ -132,8 +104,9 @@ public class ProductController {
         }
 
         String formattedPrice = NumberFormat.getNumberInstance(Locale.KOREA).format(product.getPrice());
-        model.addAttribute("product", product);
         model.addAttribute("formattedPrice", formattedPrice);
+
+        model.addAttribute("product", product);
 
         List<String> option1List = product.getOption1() != null ? List.of(product.getOption1().split(",")) : List.of();
         List<String> option2List = product.getOption2() != null ? List.of(product.getOption2().split(",")) : List.of();
@@ -144,28 +117,55 @@ public class ProductController {
         model.addAttribute("option2List", option2List);
         model.addAttribute("description", product.getDescription());
 
-        return "productDetail"; // 상세 페이지
+        return "productDetail";
 
     }
 
-    @GetMapping("/productDetail")
-    public String searchProducts
-            (@RequestParam(required = false) String productName,
-             @RequestParam(required = false) String category,
-             @RequestParam(required = false) Integer minPrice,
-             @RequestParam(required = false) Integer maxPrice, Model model ) {
-
-        List<Product> products = productService.searchProducts(productName, category, minPrice, maxPrice);
-
-        model.addAttribute("products", products);
-
-        return "productList";
-    }
-
+    /* 상품 상세 페이지 이동 */
     @GetMapping("/product/{id}")
     public String viewProductDetail(@PathVariable Long id, Model model) {
         Product product = productService.getProductById(id); // ID로 상품 조회
         model.addAttribute("product", product);
         return "productDetail";
+    }
+
+
+    @GetMapping("/purchase/completed/{id}")
+    public String purchaseCompleted(@PathVariable("id") Long id,
+                                    @RequestParam(required = false) String option1,
+                                    @RequestParam(required = false) String option2,
+                                    HttpSession session,
+                                    Model model) {
+        // 로그인 사용자 확인
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            model.addAttribute("error", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
+
+        // 상품 데이터 조회
+        Product product = productService.getProductById(id);
+        if (product == null) {
+            model.addAttribute("error", "상품 정보를 찾을 수 없습니다.");
+            return "redirect:/";
+        }
+
+        // 판매자 companyName 가져오기
+        User seller = userService.getUserBySellerId(product.getSellerId());
+        String sellerCompanyName = seller != null ? seller.getCompanyName() : "알 수 없음";
+        System.out.println(sellerCompanyName);
+        System.out.println("Seller ID: " + product.getSellerId());
+        // 모델에 데이터 추가
+        model.addAttribute("userName", loginUser.getUserName());
+        model.addAttribute("address", loginUser.getAddress());
+        model.addAttribute("companyName", sellerCompanyName);
+        System.out.println("companyName" + sellerCompanyName);
+        System.out.println("Seller ID: " + product.getSellerId());
+        model.addAttribute("product", product);
+        model.addAttribute("option1", option1 != null ? option1 : "옵션 없음");
+        model.addAttribute("option2", option2 != null ? option2 : "옵션 없음");
+        model.addAttribute("formattedPrice", NumberFormat.getNumberInstance(Locale.KOREA).format(product.getPrice()));
+
+        return "purchaseCompleted";
     }
 }

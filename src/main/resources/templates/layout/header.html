@@ -1,16 +1,30 @@
 <header class="header">
   <div class="logo">
-    <img src="/images/svg/logo.svg" alt="ZIP UP" class="hf-logo">
+    <a th:href="@{/}">
+      <img src="/images/svg/logo.svg" alt="ZIP UP" class="hf-logo">
+    </a>
   </div>
   <nav class="nav">
-    <a th:href="@{/all}" class="active">ALL</a>
-    <a th:href="@{/outer}">OUTER</a>
-    <a th:href="@{/top}">TOP</a>
-    <a th:href="@{/bottom}">BOTTOM</a>
-    <a th:href="@{/acc}">ACC</a>
+    <a th:href="@{/}" th:classappend="${selectedCategory == 'ALL'} ? 'active' : ''">ALL</a>
+    <a th:href="@{/?category=OUTER}" th:classappend="${selectedCategory == 'OUTER'} ? 'active' : ''">OUTER</a>
+    <a th:href="@{/?category=TOP}" th:classappend="${selectedCategory == 'TOP'} ? 'active' : ''">TOP</a>
+    <a th:href="@{/?category=BOTTOM}" th:classappend="${selectedCategory == 'BOTTOM'} ? 'active' : ''">BOTTOM</a>
+    <a th:href="@{/?category=ACC}" th:classappend="${selectedCategory == 'ACC'} ? 'active' : ''">ACC</a>
   </nav>
+
   <div class="auth-links">
-    <a th:href="@{/signup}">회원가입</a>
-    <a th:href="@{/login}">로그인</a>
+    <!-- 비회원 -->
+    <div th:if="${session.loginUser == null}">
+      <a th:href="@{/signup}">회원가입</a>
+      <a th:href="@{/login}">로그인</a>
+    </div>
+
+    <!-- 유저 -->
+    <div th:if="${session.loginUser != null}">
+      <a th:if="${session.loginUser.role == 'seller'}" th:href="@{/product/add}">상품 생성</a> <!-- seller -->
+      <a th:href="@{/mypage}">마이페이지</a>
+      <a th:href="@{/logout}">로그아웃</a>
+
+    </div>
   </div>
 </header>

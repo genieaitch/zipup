@@ -1,15 +1,14 @@
 package com.teamzipup.zipup.service;
 
-import com.teamzipup.zipup.dto.Product;
 import com.teamzipup.zipup.mapper.ProductMapper;
+import com.teamzipup.zipup.dto.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -20,11 +19,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> getAllProducts() {
         return productMapper.findAll();
-    }
-
-    @Override
-    public List<Product> getProductsByCategory(String category) {
-        return productMapper.findByCategory(category);
     }
 
     @Override
@@ -72,7 +66,6 @@ public class ProductServiceImpl implements ProductService {
             product.setPrice(price);
             product.setOption1(option1);
             product.setOption2(option2);
-            product.setOption3(option3);
             product.setCategory(category);
             product.setImage("/images/product_images/" + uniqueImageName);
             product.setDescription("/images/description_images/" + uniqueDescriptionName);
@@ -94,8 +87,14 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.findById(id);
     }
 
-    @Override
-    public List<Product> searchProducts(String productName, String category, Integer minPrice, Integer maxPrice) {
-        return productMapper.searchProducts(productName, category, minPrice, maxPrice);
+    // 상품 검색
+    public List<Product> searchProducts(String category, String searchType, String query, String sortOrder) {
+        return productMapper.searchProducts(category, searchType, query, sortOrder);
     }
+
+    // 오늘의 상품
+    public List<Product> getRandomProducts(int count) {
+        return productMapper.getRandomProducts(count);
+    }
+
 }

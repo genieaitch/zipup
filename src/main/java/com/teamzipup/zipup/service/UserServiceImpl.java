@@ -1,7 +1,7 @@
 package com.teamzipup.zipup.service;
 
-import com.teamzipup.zipup.dto.User;
 import com.teamzipup.zipup.mapper.UserMapper;
+import com.teamzipup.zipup.dto.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,4 +61,11 @@ public class UserServiceImpl implements UserService {
     public User getUserById(long id) {
         return userMapper.findById(id);
     }
+
+    // 판매자 정보 가져오기
+    @Override
+    public User getUserBySellerId(Long sellerId) {
+        return userMapper.getUserBySellerId(sellerId);
+    }
 }
+
