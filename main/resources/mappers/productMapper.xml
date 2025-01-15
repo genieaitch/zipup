@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.teamzipup.zipup.mapper.ProductMapper">
+
+    <!-- 전체 상품 리스트 -->
+    <select id="findAll">
+        SELECT * FROM product
+    </select>
+
+    <!-- 판매자 제품 등록 하기 -->
+    <insert id="insertProduct" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO PRODUCT (SELLERID, IMAGE, CATEGORY, PRODUCTNAME, PRICE, OPTION1, OPTION2, DESCRIPTION)
+        VALUES (#{sellerId}, #{image}, #{category}, #{productName}, #{price}, #{option1}, #{option2}, #{description});
+    </insert>
+
+
+    <!-- 제품 색상 옵션 데이터 불러오기 -->
+    <select id="optionColor">
+        SELECT OPTION1
+        FROM PRODUCT
+        WHERE id = #{id}
+    </select>
+
+    <!-- 제품 사이즈 옵션 데이터 불러오기 -->
+    <select id="optionSize">
+        SELECT OPTION2
+        FROM PRODUCT
+        WHERE id = #{id}
+    </select>
+
+    <!-- 상세페이지 이미지 불러오기-->
+    <select id="description">
+        SELECT DESCRIPTION
+        FROM PRODUCT
+        WHERE id = #{id}
+    </select>
+
+    <!-- 상품 조회 -->
+    <select id="findById">
+        SELECT *
+        FROM product
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 구매 완료 -->
+    <select id="announcement">
+        SELECT U.userName, U.phoneNumber, U.address, U.companyName, P.productName, P.option1, P.option2, P.price
+        FROM USER U
+        JOIN PRODUCT P
+        ON U.ID = P.sellerID
+        WHERE p.ID = #{id}
+    </select>
+
+    <select id="searchProducts">
+        SELECT p.*, u.companyName AS companyName
+        FROM product p
+        LEFT JOIN user u ON p.sellerId = u.id
+        WHERE 1=1
+        <if test="category != null and category != 'ALL'">
+            AND p.category = #{category}
+        </if>
+        <if test="query != null and searchType == 'productName'">
+            AND p.productName LIKE CONCAT('%', #{query}, '%')
+        </if>
+        <if test="query != null and searchType == 'companyName'">
+            AND u.companyName LIKE CONCAT('%', #{query}, '%')
+        </if>
+        <choose>
+            <when test="sortOrder == 'priceAsc'">
+                ORDER BY p.price ASC
+            </when>
+            <when test="sortOrder == 'priceDesc'">
+                ORDER BY p.price DESC
+            </when>
+            <otherwise>
+                ORDER BY RAND()
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getRandomProducts">
+        SELECT * FROM product ORDER BY RAND() LIMIT #{count}
+    </select>
+
+</mapper>

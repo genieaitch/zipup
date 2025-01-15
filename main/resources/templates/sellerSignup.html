@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>판매자 회원가입</title>
+  <link rel="icon" href="/images/img/favicon.png" type="image/x-icon">
+  <link
+          rel="stylesheet"
+          href="/css/styles.css"
+  />
+</head>
+<body>
+<div class="zipup-container">
+  <div th:replace="~{layout/subHeader :: subHeader}"></div>
+  <form class="signup-form" action="/signup/seller" method="post">
+    <label class="zipup-label">로그인 정보</label>
+    <div class="signup-form-group">
+      <input
+              type="text"
+              id="email"
+              name="email"
+              placeholder="이메일"
+              class="zipup-input"
+              required
+      />
+      <button type="button" id="check-email-btn" class="signup-checkBtn">중복 확인</button>
+    </div>
+  <input
+          id="password"
+          type="password"
+          name="password"
+          placeholder="비밀번호"
+          class="zipup-input"
+          required
+  />
+  <br />
+  <label class="zipup-label">개인정보</label>
+  <input
+          type="text"
+          name="companyName"
+          placeholder="상호명"
+          class="zipup-input"
+          required
+  />
+  <input
+          type="text"
+          name="businessNumber"
+          placeholder="사업자번호(- 없이 작성)"
+          class="zipup-input"
+          required
+  />
+  <input
+          type="text"
+          name="phoneNumber"
+          placeholder="전화번호(- 없이 작성)"
+          class="zipup-input"
+          required
+  />
+  <input
+          type="text"
+          name="address"
+          placeholder="주소"
+          class="zipup-input"
+          required
+  />
+  <br />
+
+    <button class="zipup-btn" type="submit" id="submit-btn" >가입 완료</button>
+  </form>
+</div>
+
+<script src="/js/signUp.js"></script>
+<div th:replace="~{layout/footer :: footer}"></div>
+</body>
+</html>
