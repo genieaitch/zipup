@@ -26,6 +26,8 @@ public class DBConfig {
     @Autowired // (DI, 의존성 주입)
     private ApplicationContext applicationContext; // 현재 프로젝트
 
+
+
     /////////// HikariCP 설정 /////////////
 
     @Bean
@@ -66,7 +68,7 @@ public class DBConfig {
         // sessionFactoryBean.setMapperLocations("현재프로젝트.자원.어떤파일");
 
         sessionFactoryBean.setMapperLocations(
-                applicationContext.getResources("classpath:/mappers/**.xml")  );
+            applicationContext.getResources("classpath:/mappers/**.xml")  );
 
 
         // 해당 패키지 내 모든 클래스의 별칭을 등록
@@ -82,7 +84,7 @@ public class DBConfig {
 
         // 마이바티스 설정 파일 경로 지정
         sessionFactoryBean.setConfigLocation(
-                applicationContext.getResource("classpath:mybatisConfig.xml"));
+            applicationContext.getResource("classpath:mybatisConfig.xml"));
 
         // 설정 내용이 모두 적용된 객체 반환
         return sessionFactoryBean.getObject();

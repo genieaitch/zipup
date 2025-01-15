@@ -28,8 +28,53 @@ public class ProductController {
     // 가격 포매팅
     private List<String> formatPrices(List<Product> products) {
         return (products == null || products.isEmpty())
-                ? new ArrayList<>()
-                : products.stream().map(product -> String.format("%,d", product.getPrice())).toList();
+            ? new ArrayList<>()
+            : products.stream().map(product -> String.format("%,d", product.getPrice())).toList();
+    }
+
+    /* 메인 페이지 */
+    @GetMapping("/")
+    public String mainPage(@RequestParam(value = "category", required = false) String category,
+                           @RequestParam(value = "searchType", required = false) String searchType,
+                           @RequestParam(value = "query", required = false) String query,
+                           @RequestParam(value = "sortOrder", required = false) String sortOrder,
+                           Model model) {
+
+        // 기본값 설정
+        if (category == null) category = "ALL";
+        if (searchType == null) searchType = "productName";
+        if (sortOrder == null) sortOrder = "random";
+
+        // 랜덤 상품
+        if ("ALL".equals(category)) {
+            List<Product> todayProducts = productService.getRandomProducts(4);
+            model.addAttribute("todayProducts", todayProducts);
+            model.addAttribute("formattedTodayPrices", formatPrices(todayProducts));
+        } else {
+            model.addAttribute("todayProducts", new ArrayList<>());
+        }
+
+
+        // 상품 리스트
+        List<Product> products = productService.searchProducts(category, searchType, query, sortOrder);
+        model.addAttribute("products", products);
+        model.addAttribute("formattedPrices", formatPrices(products));
+
+        // 현재 선택된 옵션 전달
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("query", query);
+        model.addAttribute("sortOrder", sortOrder);
+
+        return "index";
+    }
+
+    /* 전체 상품 리스트 페이지 */
+    @GetMapping("/products")
+    public String productListPage(Model model) {
+        List<Product> products = productService.getAllProducts();
+        model.addAttribute("products", products);
+        return "productList";
     }
 
     /* 상품 등록 페이지 */
@@ -56,7 +101,6 @@ public class ProductController {
                              @RequestParam("price") int price,
                              @RequestParam(value = "option1", required = false) String option1,
                              @RequestParam(value = "option2", required = false) String option2,
-                             @RequestParam(value = "option3", required = false) String option3,
                              @RequestParam("category") String category,
                              @RequestParam("description") MultipartFile description,
                              @RequestParam("image") MultipartFile image,
@@ -64,14 +108,9 @@ public class ProductController {
                              Model model) {
         User loginUser = (User) session.getAttribute("loginUser");
 
-        if (loginUser == null || !"seller".equals(loginUser.getRole())) {
-            model.addAttribute("error", "상품 등록 권한이 없습니다.");
-            return "redirect:/login";
-        }
-
         try {
             long sellerId = loginUser.getId();
-            long productId = productService.insertProduct(sellerId, image, productName, price, option1, option2, option3, category, description);
+            long productId = productService.insertProduct(sellerId, image, productName, price, option1, option2, category, description);
             return "redirect:/product/detail/" + productId;
         } catch (Exception e) {
             model.addAttribute("error", "상품 등록 중 문제가 발생했습니다.");
