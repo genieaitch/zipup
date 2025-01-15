@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZIP UP</title>
+  <link rel="icon" href="/images/img/favicon.png" type="image/x-icon">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div th:replace="~{layout/header :: header}"></div>
+
+    <div class="content-container">
+    <!-- 배너 -->
+    <div class="banner">
+      <img src="/images/img/mainBanner.png" alt="mainBanner" style="width: 100%">
+    </div>
+
+    <!-- 오늘의 상품 리스트 -->
+      <p th:if="${selectedCategory == 'ALL' && query == null}" class="product-text">TODAY BEST</p>
+    <div th:if="${selectedCategory == 'ALL' && query == null}" class="today-products">
+
+      <div th:replace="~{todayProductList :: todayProductList}"></div>
+    </div>
+
+      <!-- 검색 폼 -->
+    <div class="search-container">
+        <span class="product-list-text" th:text="${selectedCategory}"></span>
+        <div class="search">
+      <form action="/" method="get" class="search-form">
+        <input type="text" name="query" th:value="${query}" placeholder="검색어를 입력하세요" class="search-input">
+        <select name="searchType" class="search-dropdown">
+          <option value="productName" th:selected="${searchType == 'productName'}">상품명</option>
+          <option value="companyName" th:selected="${searchType == 'companyName'}">회사명</option>
+        </select>
+        <input type="hidden" name="category" th:value="${selectedCategory}">
+        <button type="submit" class="search-button">검색</button>
+      </form>
+
+      <!-- 정렬 폼 -->
+      <form action="/" method="get" class="sort-form">
+        <select name="sortOrder" class="search-dropdown">
+          <option value="priceAsc" th:selected="${sortOrder == 'priceAsc'}">가격 오름차순</option>
+          <option value="priceDesc" th:selected="${sortOrder == 'priceDesc'}">가격 내림차순</option>
+        </select>
+        <input type="hidden" name="category" th:value="${selectedCategory}">
+        <input type="hidden" name="query" th:value="${query}">
+        <input type="hidden" name="searchType" th:value="${searchType}">
+        <button type="submit" class="search-button">정렬</button>
+      </form>
+        </div>
+    </div>
+
+
+    <!-- 상품 리스트 -->
+    <div th:if="${products.size() > 0}" th:replace="~{productList :: productList}"></div>
+
+    <!-- 검색 결과 없음 -->
+    <div th:if="${products.size() == 0}" class="search-no-results">
+      검색 결과가 없습니다.
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+</body>
+</html>
